@@ -7,6 +7,9 @@ rich set of higher-level tools including Spark SQL for SQL and DataFrames,
 MLlib for machine learning, GraphX for graph processing,
 and Spark Streaming for stream processing.
 
+export MAVEN_OPTS="-Xmx1024m -Xms1024m"
+mvn  -DskipTests clean package
+
 <http://spark.apache.org/>
 
 

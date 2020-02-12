@@ -21,7 +21,6 @@ import java.lang.reflect.ParameterizedType
 
 import scala.reflect.runtime.universe.TypeTag
 import scala.util.Try
-
 import org.apache.spark.annotation.InterfaceStability
 import org.apache.spark.api.python.PythonEvalType
 import org.apache.spark.internal.Logging
@@ -33,7 +32,7 @@ import org.apache.spark.sql.execution.aggregate.ScalaUDAF
 import org.apache.spark.sql.execution.python.UserDefinedPythonFunction
 import org.apache.spark.sql.expressions.{UserDefinedAggregateFunction, UserDefinedFunction}
 import org.apache.spark.sql.types.DataType
-import org.apache.spark.sql.udaf.sumCountAvg
+import org.apache.spark.sql.udaf.{CompareValueSum, sumCountAvg}
 import org.apache.spark.util.Utils
 
 /**
@@ -1176,4 +1175,5 @@ class UDFRegistration private[sql](functionRegistry: FunctionRegistry) extends L
 
   //
   register("sumcountavg", new sumCountAvg())
+  register("compare_sum", new CompareValueSum())
 }

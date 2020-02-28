@@ -18,8 +18,8 @@
 // scalastyle:off println
 package org.apache.spark.examples
 
-import org.apache.spark.{SparkConf, SparkContext}
-import org.apache.spark.sql.{Row, SQLContext}
+import org.apache.spark.SparkConf
+import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.catalyst.expressions.Expression
 import org.apache.spark.sql.catalyst.expressions.codegen.{CodegenContext, ExprCode}
@@ -29,32 +29,23 @@ object HllExpression {
   def main(args: Array[String]): Unit = {
 
     val conf = new SparkConf()
-      .setMaster("local")
-      .setAppName("UDFScala")
+      .setMaster("local[10]")
+      .setAppName("UDAF")
 
-    val sc = new SparkContext(conf)
+    val session = SparkSession
+      .builder().config(conf).getOrCreate()
 
-    val sqlContext = new SQLContext(sc)
-
-    val names = Array(
-      "yarn",
-      "marry",
-      "jack",
-      "tom",
-      "tom"
-    )
-
-    val nameRDD = sc.parallelize(names, 3)
-
-    val nameRowRDD = nameRDD.map(name => Row(name))
-
-    val structType = StructType(Array(StructField("name", StringType, true)))
-
-    val nameDF = sqlContext.createDataFrame(nameRowRDD, structType)
-
-    nameDF.registerTempTable("names")
+    session.read.json("examples/tongbi.json")
+      .createOrReplaceTempView("a")
 
 
-    sqlContext.sql("select name,hashp(name) from names ").show()
+    session.sql(s" select  CONCAT(SUBSTR(report_date,1,4), 'y'," +
+      s" SUBSTR(report_date,5,2), 'm', SUBSTR(report_date,7,2), 'd') " +
+      s" AS `report_date_1582684001789`," +
+      s"order_num as order_num_1582625795089 " +
+      s"from (select compare_sum(report_date,count,'ymd','1') as m from a) t " +
+      s"LATERAL VIEW explode(t.m) tt as report_date ,order_num " +
+      s"order by tt.report_date desc")
+      .show()
   }
 }

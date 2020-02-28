@@ -25,7 +25,7 @@ import org.apache.spark.sql.types.{DataType, DataTypes, StructType}
 /**
  *
  */
-class sumCountAvg extends UserDefinedAggregateFunction {
+class sumCountAvg extends UserDefinedAggregateFunction with Serializable{
 
   override def inputSchema: StructType = {
     DataTypes.createStructType(util.Arrays.asList(
